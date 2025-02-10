@@ -2,194 +2,137 @@ package com.chandu;
 
 import java.util.Scanner;
 
-class Test{
+class Board {
 	Scanner s = new Scanner(System.in);
 	int n;
 	int a[][];
+
 	void get(int x) {
-		n=x;
-		a=new int[n][n];
+		n = x;
+		a = new int[n][n];
+		read();
+		display();
 	}
-	int c=0;
-	int d=0;
-	void read() {					//reading the matrix values
-		for(int i=0;i<n;i++) {
-			for(int j=0;j<n;j++) {
-				System.out.print("enter the "+i+","+j+"element: ");
-				a[i][j]=s.nextInt();
-				if(a[i][j]==0 || a[i][j]==1) {
-					continue;
-				}
-				else {
-					System.out.println("please enter in the format of 0's and 1's");
-					j=j-1;
-				}				
-			}
-		}
-		System.out.println();
-	}
+
+	void read() { // Reading the matrix values
+        for (int i = 0; i < n; i++) {
+            int sum = 0;
+            for (int j = 0; j < n; j++) {
+                System.out.print("Enter the element at (" + i + "," + j + "): ");
+                a[i][j] = s.nextInt();
+
+                if (a[i][j] != 0 && a[i][j] != 1) {
+                    System.out.println("Please enter only 0 or 1.");
+                    j--; // Allow user to re-enter valid input
+                } else {
+                    sum += a[i][j];
+                }
+            }
+
+            // Ensure exactly one queen per row
+            if (sum > 1) {
+                System.out.println("More than one queen in row " + i + ". Please re-enter the row.");
+                i--; // Re-enter the entire row
+            } else if (sum < 1) {
+                System.out.println("At least one queen must be in row " + i + ". Please re-enter the row.");
+                i--; // Re-enter the entire row
+            }
+        }
+        System.out.println();
+    }
 	
-	
-	void display() {				//display matrix values
-		for(int i=0;i<n;i++) {
-			for(int j=0;j<n;j++) {
-				System.out.print(a[i][j]+" ");
+	void display() { // display matrix values
+		for (int i = 0; i < n; i++) {
+			for (int j = 0; j < n; j++) {
+				System.out.print(a[i][j] + " ");
 			}
 			System.out.println();
 		}
 	}
-	
-	int check() {
-		
-		for(int i=0;i<n;i++) {
-			int sum=0;
-			for(int j=0;j<n;j++) {
-				for(int k=0;k<n;k++) {
-					if(j==i) {
-						sum=sum+a[j][k];
-					}
-				}
-			}
-			if(sum!=1) {
-				System.out.println("please enter atleast 1 in "+i+"row");
-				d++;
-			}
-		}
-		return d;
-	}
+
 }
 
-class Test2 extends Test{
+class NQueensValidator extends Board {
 	
+	void cal() {
 
-	int col() {						//checking column duplicates
-	
-		if(d==0) {
-		for(int i=0;i<n;i++) {
-			int sum=0;
-			for(int j=0;j<n;j++) {
-				for(int k=0;k<n;k++) {
-					if(k==i) {
-						sum=sum+a[j][k];
-					}
-				}
-			}
-			if(sum==2) {
-				c++;
-				break;
-			}
-		}
-		}
-		
-		return c;
-
-	}
-	
-	
-	
-	int row() {					//checking row duplicates
-		
-		if(d==0) {
-		for(int i=0;i<n;i++) {
-			int sum=0;
-			for(int j=0;j<n;j++) {
-				for(int k=0;k<n;k++) {
-					if(j==i) {
-						sum=sum+a[j][k];
-						//System.out.println(sum);
-						//System.out.print(a[j][k]);
-					}
-				}
-				System.out.println();
-			}
-			if(sum==2) {
-				c++;
-				break;
-			}
-		}
-		}
-		return c;
-	}
-	
-	
-	int diagonal1() {
-		if(d==0) {
-		int ssum = 0;
-		for(int i=0;i<((2*n)-1);i++) {
-			ssum=0;
-			for(int j=0;j<n;j++) {
-				for(int k=0;k<n;k++) {
-					if(j+k==i) {
-						ssum=ssum+a[j][k];
-					}
-				  }
-				}	
-			if(ssum==2) {
-				c++;
-				break;
-			}
-			System.out.println();
-		}
-		}
-		return c;
-	}
-	
-	int diagonal2() {
-		if(d==0) {
-		int ssum = 0;
-		for(int i=0;i<((2*n)-1);i++) {
-			ssum=0;
-			for(int j=0;j<n;j++) {
-				for(int k=0;k<n;k++) {
-					if(((j-k)+(n-1))==i) {
-						ssum=ssum+a[j][k];
-					}
-				  }
-				}	
-			if(ssum==2) {
-				c++;
-				break;
-			}
-			System.out.println();
-		}
-		}
-		return c;
-	}
-	
-	
-	void count() {					// count based verification
-		if(d==0) {
-		if(c==0) {
+		if (col() && d1() && d2()) {
 			System.out.println("success");
+		} else {
+			System.out.println("failure");
 		}
-		else {
-			System.out.println("try again");
+
+	}
+
+	boolean col() { // checking column duplicates
+		for (int i = 0; i < n; i++) {
+			int sum = 0;
+			for (int k = 0; k < n; k++) {
+				sum += a[k][i];
+			}
+			if (sum > 1) {
+			    System.out.println("More than one queen in column " + i);
+			    return false;
+			} else if (sum < 1) {
+			    System.out.println("No queen in column " + i);
+			    return false;
+			}
 		}
+		return true;
 	}
+
+	boolean d1() {  // checking d1 duplicates left to right
+		for (int i = 0; i < ((2 * n) - 1); i++) {
+			int sum = 0;
+			for (int j = 0; j < n; j++) {
+				for (int k = 0; k < n; k++) {
+					if (j + k == i) {
+						sum += a[j][k];
+					}
+				}
+			}
+			if (sum > 1) {
+                System.out.println("More than one queen in left to right  diagonal");
+				return false;
+			}
+		}
+		return true;
 	}
-	
+		
+	boolean d2() {  // checking d2 duplicates right to left
+		for (int i = 0; i < ((2 * n) - 1); i++) {
+			int sum = 0;
+			for (int j = 0; j < n; j++) {
+				for (int k = 0; k < n; k++) {
+					if (((j - k) + (n - 1)) == i) {
+						sum = sum + a[j][k];
+					}
+				}
+			}
+			if (sum > 1) {
+				return false;
+			}
+		}
+		return true;
+	}
+
 }
 
-public class nqueens{
+public class nqueens {
 
 	public static void main(String[] args) {
-		Scanner sc= new Scanner(System.in);
-		System.out.println("Enter the size of matrix");
-		int x=sc.nextInt();
-		if(x<4) {
-			System.out.println("matrix size must be minimum 4");
-		}
-		else {
-		Test2 t= new Test2();
-		t.get(x);
-		t.read();
-		t.display();
-		t.check();
-		t.col();
-		t.row();
-		t.diagonal1();
-		t.diagonal2();
-		t.count();
-		}
+		Scanner sc = new Scanner(System.in);
+		int x;
+		do {
+			System.out.println("Enter the size of matrix");
+			x = sc.nextInt();
+			if(x<4) {
+				System.out.println("matrix size must be minimum 4");
+			}
+		}while(x<4);
+
+		NQueensValidator q = new NQueensValidator();
+		q.get(x);
+		q.cal();
 	}
 }
